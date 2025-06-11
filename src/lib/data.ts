@@ -1,377 +1,204 @@
 import type { Product } from "@/types/product";
 
-// Sample data based on your CSV structure
-const sampleProducts: Product[] = [
-  {
-    id: "8121622593775",
-    title: "Craving and Stress Support",
-    handle:
-      "thorne-craving-and-stress-support-formerly-relora-plus-60-capsules",
-    description:
-      "Key Benefits: Reduces stress, Improves sleep quality, Keeps your mental focus intact. Thorne's PharmaGABA is centred around the natural form of gamma-aminobutyric acid (GABA), a crucial neurotransmitter.",
-    vendor: "Thorne",
-    productType: "Stress Tablets",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 18.55, currencyCode: "USD" },
-      maxVariantPrice: { amount: 18.55, currencyCode: "USD" },
-    },
-    totalInventory: 30,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:45.000Z",
-    updatedAt: "2025-03-21T13:10:43.000Z",
-    seoTags: ["stress", "supplements", "health"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "3",
-    title: "Omega-3 Fish Oil",
-    handle: "omega-3-fish-oil",
-    description:
-      "High-quality omega-3 fatty acids for heart and brain health. Sourced from wild-caught fish.",
-    vendor: "Nordic Naturals",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 32.99, currencyCode: "USD" },
-      maxVariantPrice: { amount: 32.99, currencyCode: "USD" },
-    },
-    totalInventory: 50,
-    hasOutOfStockVariants: false,
-    seoTags: ["omega-3", "fish-oil", "heart-health"],
-  },
-  {
-    id: "4",
-    title: "Vitamin D3 + K2",
-    handle: "vitamin-d3-k2",
-    description:
-      "Synergistic combination of Vitamin D3 and K2 for optimal bone health and calcium absorption.",
-    vendor: "Life Extension",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 19.95, currencyCode: "USD" },
-      maxVariantPrice: { amount: 19.95, currencyCode: "USD" },
-    },
-    totalInventory: 0,
-    hasOutOfStockVariants: true,
-    seoTags: ["vitamin-d", "vitamin-k", "bone-health"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "8121623478511",
-    title: "PharmaGABA-100",
-    handle: "thorne-pharmagaba-100-60-capsules",
-    description:
-      "Clinical studies have shown that PharmaGABA can reduce stress-related beta waves in the brain and simultaneously boost the production of alpha-waves. In addition, this natural GABA variant has been found to have a positive impact on sleep quality.",
-    vendor: "Thorne",
-    productType: "Vitamins & Supplements",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 24.49, currencyCode: "USD" },
-      maxVariantPrice: { amount: 24.49, currencyCode: "USD" },
-    },
-    totalInventory: 25,
-    hasOutOfStockVariants: false,
-    createdAt: "2023-09-25T15:52:51.000Z",
-    updatedAt: "2025-03-21T13:10:44.000Z",
-    seoTags: ["sleep", "gaba", "supplements"],
-  },
-  {
-    id: "5",
-    title: "Magnesium Glycinate",
-    handle: "magnesium-glycinate",
-    description:
-      "Highly bioavailable form of magnesium for muscle relaxation and better sleep quality.",
-    vendor: "Pure Encapsulations",
-    productType: "Minerals",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 28.5, currencyCode: "USD" },
-      maxVariantPrice: { amount: 28.5, currencyCode: "USD" },
-    },
-    totalInventory: 40,
-    hasOutOfStockVariants: false,
-    seoTags: ["magnesium", "sleep", "muscle-health"],
-  },
-  {
-    id: "6",
-    title: "Probiotics Complex",
-    handle: "probiotics-complex",
-    description:
-      "Multi-strain probiotic formula to support digestive health and immune function.",
-    vendor: "Garden of Life",
-    productType: "Probiotics",
-    status: "ACTIVE",
-    featuredImage: "/placeholder.svg?height=300&width=300",
-    priceRange: {
-      minVariantPrice: { amount: 45.99, currencyCode: "USD" },
-      maxVariantPrice: { amount: 45.99, currencyCode: "USD" },
-    },
-    totalInventory: 20,
-    hasOutOfStockVariants: false,
-    seoTags: ["probiotics", "digestive-health", "immune-support"],
-  },
-];
-
-export async function loadProducts(): Promise<Product[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 500));
-
-  // Return sample data
-  return sampleProducts;
-}
-
-// Enhanced CSV parsing function that handles your specific CSV structure
 export function parseCSVData(csvContent: string): Product[] {
   const lines = csvContent.split("\n").filter((line) => line.trim());
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(",").map((h) => h.trim().replace(/"/g, ""));
+  const headers = parseCSVLine(lines[0]);
+
+  const columnIndices = {
+    id: findColumnIndex(headers, ["ID"]),
+    title: findColumnIndex(headers, ["TITLE"]),
+    handle: findColumnIndex(headers, ["HANDLE"]),
+    vendor: findColumnIndex(headers, ["VENDOR"]),
+    productType: findColumnIndex(headers, ["PRODUCT_TYPE"]),
+    priceRange: findColumnIndex(headers, ["PRICE_RANGE"]),
+    totalInventory: findColumnIndex(headers, ["TOTAL_INVENTORY"]),
+    hasOutOfStock: findColumnIndex(headers, ["HAS_OUT_OF_STOCK_VARIANTS"]),
+    createdAt: findColumnIndex(headers, ["CREATED_AT"]),
+    updatedAt: findColumnIndex(headers, ["UPDATED_AT"]),
+    tags: findColumnIndex(headers, ["TAGS"]),
+    status: findColumnIndex(headers, ["STATUS"]),
+  };
+
   const products: Product[] = [];
+  let successCount = 0;
+  let errorCount = 0;
 
   for (let i = 1; i < lines.length; i++) {
     try {
-      // Handle CSV parsing with proper quote handling for complex data
-      const values: string[] = [];
-      let currentValue = "";
-      let inQuotes = false;
-      let j = 0;
+      const values = parseCSVLine(lines[i]);
 
-      while (j < lines[i].length) {
-        const char = lines[i][j];
-        if (char === '"') {
-          inQuotes = !inQuotes;
-        } else if (char === "," && !inQuotes) {
-          values.push(currentValue.trim());
-          currentValue = "";
-          j++;
-          continue;
-        } else {
-          currentValue += char;
+      const getValue = (index: number, fieldName: string = ""): string => {
+        if (index < 0) {
+          return "";
         }
-        j++;
-      }
-      values.push(currentValue.trim());
 
-      if (values.length < headers.length) continue;
-
-      // Helper function to get column value by name
-      const getColumnValue = (columnName: string) => {
-        const index = headers.findIndex((h) =>
-          h.toUpperCase().includes(columnName.toUpperCase())
-        );
-        return index >= 0 ? values[index]?.replace(/"/g, "") || "" : "";
+        const value = values[index]?.trim() || "";
+        if (i === 1 && fieldName) {
+        }
+        return value;
       };
+      const id = getValue(columnIndices.id, "ID");
+      const title = getValue(columnIndices.title, "TITLE");
+      const handle = getValue(columnIndices.handle, "HANDLE");
+      const vendor = getValue(columnIndices.vendor, "VENDOR");
+      const productType = getValue(columnIndices.productType, "PRODUCT_TYPE");
+      const priceRangeStr = getValue(columnIndices.priceRange, "PRICE_RANGE");
+      const totalInventoryStr = getValue(
+        columnIndices.totalInventory,
+        "TOTAL_INVENTORY"
+      );
+      const hasOutOfStockStr = getValue(
+        columnIndices.hasOutOfStock,
+        "HAS_OUT_OF_STOCK"
+      );
+      const createdAt = getValue(columnIndices.createdAt, "CREATED_AT");
+      const updatedAt = getValue(columnIndices.updatedAt, "UPDATED_AT");
+      const tagsStr = getValue(columnIndices.tags, "TAGS");
+      const status = getValue(columnIndices.status, "STATUS");
 
-      const id = getColumnValue("ID");
-      const title = getColumnValue("TITLE");
+      if (!title) {
+        console.log(`❌ Row ${i}: No title found, skipping`);
+        errorCount++;
+        continue;
+      }
 
-      if (!id || !title) continue;
-
-      // Parse price range from JSON format
+      // Parse price range
       let priceRange;
-      const priceRangeStr =
-        getColumnValue("PRICE_RANGE_V2") || getColumnValue("PRICE_RANGE");
       if (priceRangeStr) {
         try {
           const priceData = JSON.parse(priceRangeStr);
+          console.log("The price data parse: ", priceData);
           priceRange = {
             minVariantPrice: {
               amount: Number.parseFloat(
-                priceData.min_variant_price?.amount || "0"
+                priceData.min_variant_price?.amount || "24.00"
               ),
               currencyCode: priceData.min_variant_price?.currency_code || "USD",
             },
             maxVariantPrice: {
               amount: Number.parseFloat(
-                priceData.max_variant_price?.amount || "0"
+                priceData.max_variant_price?.amount || "28.00"
               ),
               currencyCode: priceData.max_variant_price?.currency_code || "USD",
             },
           };
-        } catch {
-          // Fallback for simple price format
-          const price = Number.parseFloat(priceRangeStr) || 0;
+        } catch (e) {
+          console.log(`⚠️  Failed to parse price range JSON: ${e}`);
+          const min_price =
+            Number.parseFloat(priceRangeStr.replace(/[^0-9.]/g, "")) || 24.0;
+          const max_price =
+            Number.parseFloat(priceRangeStr.replace(/[^0-9.]/g, "")) || 28.0;
           priceRange = {
-            minVariantPrice: { amount: price, currencyCode: "USD" },
-            maxVariantPrice: { amount: price, currencyCode: "USD" },
+            minVariantPrice: { amount: min_price, currencyCode: "USD" },
+            maxVariantPrice: { amount: max_price, currencyCode: "USD" },
           };
         }
       }
 
-      // Parse SEO tags from JSON or simple format
-      let seoTags: string[] = [];
-      const seoStr = getColumnValue("SEO") || getColumnValue("TAGS");
-      if (seoStr) {
-        try {
-          const seoData = JSON.parse(seoStr);
-          if (seoData.description) {
-            seoTags = seoData.description
-              .split(",")
-              .map((tag: string) => tag.trim());
-          }
-        } catch {
-          seoTags = seoStr
-            .split(",")
+      const seoTags = tagsStr
+        ? tagsStr
+            .split(/[,|]/)
             .map((tag) => tag.trim())
-            .filter(Boolean);
-        }
-      }
+            .filter(Boolean)
+            .filter((tag) => tag.length > 0 && tag.length < 50)
+            .slice(0, 10)
+        : [];
+
+      const totalInventory = totalInventoryStr
+        ? Number.parseInt(totalInventoryStr) || 0
+        : 0;
+      const hasOutOfStockVariants = hasOutOfStockStr?.toUpperCase() === "TRUE";
+
+      const productStatus = ["ACTIVE", "ARCHIVED", "DRAFT"].includes(
+        status?.toUpperCase()
+      )
+        ? (status.toUpperCase() as "ACTIVE" | "ARCHIVED" | "DRAFT")
+        : "ACTIVE";
 
       const product: Product = {
-        id,
-        title,
+        id: id || String(i),
+        title: title.trim(),
         handle:
-          getColumnValue("HANDLE") || title.toLowerCase().replace(/\s+/g, "-"),
-        description:
-          getColumnValue("DESCRIPTION") ||
-          getColumnValue("DESCRIPTION_HTML")?.replace(/<[^>]*>/g, ""),
-        vendor: getColumnValue("VENDOR"),
-        productType: getColumnValue("PRODUCT_TYPE"),
-        status: (getColumnValue("STATUS") as any) || "ACTIVE",
-        featuredImage:
-          getColumnValue("FEATURED_IMAGE") || getColumnValue("IMAGE"),
+          handle ||
+          title
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-|-$/g, ""),
+        vendor: vendor || "Unknown",
+        productType: productType || "Uncategorized",
+        status: productStatus,
+        featuredImage: "/placeholder.svg?height=400&width=400",
         priceRange,
-        totalInventory: Number.parseInt(getColumnValue("TOTAL_INVENTORY")) || 0,
-        hasOutOfStockVariants:
-          getColumnValue("HAS_OUT_OF_STOCK_VARIANTS")?.toLowerCase() === "true",
-        onlineStoreUrl:
-          getColumnValue("ONLINE_STORE_URL") || getColumnValue("SHOP_URL"),
-        createdAt: getColumnValue("CREATED_AT"),
-        updatedAt: getColumnValue("UPDATED_AT"),
+        totalInventory,
+        hasOutOfStockVariants,
+        createdAt,
+        updatedAt,
         seoTags,
       };
 
       products.push(product);
+      successCount++;
+      console.log(successCount);
     } catch (error) {
-      console.warn(`Error parsing row ${i}:`, error);
+      console.error(`❌ Error parsing row ${i}:`, error);
+      errorCount++;
+      console.log(errorCount);
       continue;
     }
   }
 
+  console.log("The product data: ", products);
+
   return products;
+}
+
+function parseCSVLine(line: string): string[] {
+  const values: string[] = [];
+  let currentValue = "";
+  let inQuotes = false;
+  let i = 0;
+
+  while (i < line.length) {
+    const char = line[i];
+    const nextChar = i + 1 < line.length ? line[i + 1] : null;
+
+    if (char === '"') {
+      if (inQuotes && nextChar === '"') {
+        currentValue += '"';
+        i += 2;
+      } else {
+        inQuotes = !inQuotes;
+        i++;
+      }
+    } else if (char === "," && !inQuotes) {
+      values.push(currentValue);
+      currentValue = "";
+      i++;
+    } else {
+      currentValue += char;
+      i++;
+    }
+  }
+
+  values.push(currentValue);
+
+  return values;
+}
+
+function findColumnIndex(headers: string[], possibleNames: string[]): number {
+  for (const name of possibleNames) {
+    const index = headers.findIndex(
+      (h) => h.toUpperCase().trim() === name.toUpperCase().trim()
+    );
+    if (index >= 0) {
+      return index;
+    }
+  }
+  return -1;
+}
+
+export async function loadProducts(): Promise<Product[]> {
+  return [];
 }

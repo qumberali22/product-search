@@ -76,34 +76,9 @@ export function searchProducts(
 
       case "relevance":
       default:
-        // For relevance, we could implement a scoring system
-        // For now, just return as-is
         return 0;
     }
   });
 
   return filtered;
-}
-
-// Fuzzy search implementation for better search results
-export function fuzzySearch(text: string, query: string): number {
-  const textLower = text.toLowerCase();
-  const queryLower = query.toLowerCase();
-
-  if (textLower.includes(queryLower)) {
-    return 1; // Exact match gets highest score
-  }
-
-  // Simple fuzzy matching - count matching characters
-  let matches = 0;
-  let queryIndex = 0;
-
-  for (let i = 0; i < textLower.length && queryIndex < queryLower.length; i++) {
-    if (textLower[i] === queryLower[queryIndex]) {
-      matches++;
-      queryIndex++;
-    }
-  }
-
-  return matches / queryLower.length;
 }
