@@ -41,7 +41,7 @@ export function SearchBar({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 h-12 px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full pl-10 h-12 px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
@@ -62,7 +62,7 @@ export function SearchBar({
               <button
                 key={option.value}
                 onClick={() => {
-                  onSortChange(option.value as any);
+                  onSortChange(option.value as "relevance" | "price-asc" | "price-desc" | "name" | "date");
                   setIsDropdownOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${

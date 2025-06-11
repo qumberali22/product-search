@@ -7,12 +7,14 @@ interface ResultsGridProps {
   products: Product[];
   loading: boolean;
   searchQuery: string;
+  onProductClick: (product: Product) => void;
 }
 
 export function ResultsGrid({
   products,
   loading,
   searchQuery,
+  onProductClick,
 }: ResultsGridProps) {
   if (loading) {
     return (
@@ -54,7 +56,11 @@ export function ResultsGrid({
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            onProductClick={onProductClick}
+          />
         ))}
       </div>
     </div>

@@ -25,7 +25,7 @@ export interface Product {
   updatedAt?: string;
   publishedAt?: string;
   seoTags?: string[];
-  metafields?: Record<string, any>;
+  metafields?: Record<string, string | number | boolean | null>;
 }
 
 export interface SearchFilters {
