@@ -7,7 +7,7 @@ import { Filters } from "@/components/search/Filters";
 import { ResultsGrid } from "@/components/search/ResultsGrid";
 import { ProductTable } from "@/components/search/ProductTable";
 import { ViewToggle } from "@/components/search/ViewToggle";
-// import { PaginationControls } from "@/components/search/PaginationControls";
+import { PaginationControls } from "@/components/search/PaginationControls";
 // import { CsvUpload } from "@/components/upload/CsvUpload";
 import { loadProducts } from "@/lib/data";
 import { searchProducts } from "@/lib/search";
@@ -21,7 +21,7 @@ export default function HomePage() {
   const [dataSource, setDataSource] = useState<"sample" | "uploaded">("sample");
   const [view, setView] = useState<"grid" | "table">("table");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
   const [filters, setFilters] = useState<SearchFilters>({
     vendor: "",
     productType: "",
@@ -109,6 +109,8 @@ export default function HomePage() {
       </div>
     );
   }
+
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className="bg-gray-50">
@@ -199,8 +201,21 @@ export default function HomePage() {
                   loading={false}
                   searchQuery={searchQuery}
                 />
+                {filteredProducts.length > itemsPerPage && (
+                  <div className="mt-6">
+                    <PaginationControls
+                      currentPage={currentPage}
+                      totalPages={totalPages}
+                      itemsPerPage={itemsPerPage}
+                      totalItems={filteredProducts.length}
+                      onPageChange={handlePageChange}
+                      onItemsPerPageChange={handleItemsPerPageChange}
+                    />
+                  </div>
+                )}
               </>
             )}
+            Z
           </main>
         </div>
       </div>
