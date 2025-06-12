@@ -241,7 +241,7 @@ export function ProductDetailsModal({
                   </div>
                   <div>
                     <div className="text-sm text-gray-600 font-medium mb-1">
-                      Updated At
+                      Modified At
                     </div>
                     <div className="text-gray-900">
                       {formatDate(product.updatedAt)}
