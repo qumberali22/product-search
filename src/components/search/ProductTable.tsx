@@ -17,10 +17,9 @@ interface ProductTableProps {
 }
 
 const COLUMNS = [
-  { key: "product", label: "Product", width: "320px" },
-  { key: "title", label: "Title", width: "200px" }, // New column added here
+  { key: "product", label: "Title", width: "320px" }, // Changed from "Product" to "Title"
   { key: "vendor", label: "Vendor", width: "120px" },
-  { key: "type", label: "Type", width: "160px" },
+  { key: "type", label: "Product Type", width: "160px" }, // Changed from "Type" to "Product Type"
   { key: "minPrice", label: "Min Price", width: "100px" },
   { key: "maxPrice", label: "Max Price", width: "100px" },
   { key: "stock", label: "Stock", width: "140px" },
@@ -186,43 +185,39 @@ export function ProductTable({
           </div>
         </div>
       </td>
-      {/* New Title column skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[1].width }}>
-        {createSkeleton("h-4", "w-32")}
-      </td>
-      {COLUMNS.slice(2, -4).map(({ key, width }) => (
+      {COLUMNS.slice(1, -4).map(({ key, width }) => (
         <td key={key} className={STYLES.tableCell} style={{ width }}>
           {createSkeleton("h-4", "w-16")}
         </td>
       ))}
       {/* Min Price skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
         {createSkeleton("h-4", "w-16")}
       </td>
       {/* Max Price skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
         {createSkeleton("h-4", "w-16")}
       </td>
       {/* Stock skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
         <div className="space-y-2">
           {createSkeleton("h-6 rounded-full", "w-20")}
           {createSkeleton("h-3", "w-12")}
         </div>
       </td>
       {/* Tags skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
         <div className="flex gap-1">
           {createSkeleton("h-6 rounded-full", "w-16")}
           {createSkeleton("h-6 rounded-full", "w-16")}
         </div>
       </td>
       {/* Created skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
         {createSkeleton("h-4", "w-16")}
       </td>
       {/* Actions skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[9].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
         <div className="flex justify-center">
           {createSkeleton("h-8 w-8 rounded-full")}
         </div>
@@ -281,33 +276,27 @@ export function ProductTable({
             </div>
           </div>
         </td>
-        {/* New Title column */}
         <td className={STYLES.tableCell} style={{ width: COLUMNS[1].width }}>
-          <div className="text-sm font-medium text-gray-900">
-            {truncateText(product.title || "N/A", 25)}
-          </div>
-        </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[2].width }}>
           <div className="text-sm font-medium text-gray-900">
             {truncateText(product.vendor || "Unknown", 15)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[2].width }}>
           <div className="text-sm text-gray-900">
             {truncateText(product.productType || "Uncategorized", 20)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
           <div className="text-sm font-medium text-gray-900">
             {formatMinPrice(product)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
           <div className="text-sm font-medium text-gray-900">
             {formatMaxPrice(product)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
           <div className="flex flex-col space-y-1">
             <span
               className={`${STYLES.tagBase} font-medium w-fit ${stockStatus.bgColor} ${stockStatus.color}`}
@@ -319,7 +308,7 @@ export function ProductTable({
             </span>
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
           <div className="flex flex-wrap gap-1">
             {product.seoTags?.slice(0, 2).map((tag, tagIndex) => (
               <span
@@ -340,12 +329,12 @@ export function ProductTable({
             )}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
           <div className="text-sm text-gray-500">
             {formatDate(product.createdAt)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[9].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
           <div className="flex justify-center">
             <button
               onClick={(e) => {
@@ -427,7 +416,7 @@ export function ProductTable({
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
-            Products ({products.length.toLocaleString()} total)
+            Total Products ({products.length.toLocaleString()} total)
           </h3>
           <div className="text-sm text-gray-500">
             Showing {startIndex + 1}-{Math.min(endIndex, products.length)} of{" "}

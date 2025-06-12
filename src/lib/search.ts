@@ -4,7 +4,7 @@ export function searchProducts(
   products: Product[],
   query: string,
   filters: SearchFilters,
-  sortBy: "relevance" | "price-asc" | "price-desc" | "name" | "date"
+  sortBy: "price-asc" | "price-desc" | "name" | "date" | "date-asc"
 ): Product[] {
   let filtered = products;
 
@@ -49,32 +49,44 @@ export function searchProducts(
   // Apply price range filter
   filtered = filtered.filter((product) => {
     if (!product.priceRange) return true;
-    const price = product.priceRange.minVariantPrice.amount;
-    return price >= filters.priceRange.min && price <= filters.priceRange.max;
+    const minPrice = product.priceRange.minVariantPrice.amount;
+    const maxPrice = product.priceRange.maxVariantPrice.amount;
+    return (
+      minPrice >= filters.priceRange.min && maxPrice <= filters.priceRange.max
+    );
   });
 
   // Apply sorting
   filtered.sort((a, b) => {
     switch (sortBy) {
       case "name":
+        // Sort by product title alphabetically
         return a.title.localeCompare(b.title);
 
       case "price-asc":
-        const priceA = a.priceRange?.minVariantPrice.amount || 0;
-        const priceB = b.priceRange?.minVariantPrice.amount || 0;
-        return priceA - priceB;
+        // Sort by minimum price (low to high)
+        const minPriceA = a.priceRange?.minVariantPrice.amount || 0;
+        const minPriceB = b.priceRange?.minVariantPrice.amount || 0;
+        return minPriceA - minPriceB;
 
       case "price-desc":
-        const priceA2 = a.priceRange?.minVariantPrice.amount || 0;
-        const priceB2 = b.priceRange?.minVariantPrice.amount || 0;
-        return priceB2 - priceA2;
+        // Sort by maximum price (high to low)
+        const maxPriceA = a.priceRange?.maxVariantPrice.amount || 0;
+        const maxPriceB = b.priceRange?.maxVariantPrice.amount || 0;
+        return maxPriceB - maxPriceA;
 
       case "date":
+        // Sort by creation date (newest first)
         const dateA = new Date(a.createdAt || 0).getTime();
         const dateB = new Date(b.createdAt || 0).getTime();
         return dateB - dateA;
 
-      case "relevance":
+      case "date-asc":
+        // Sort by creation date (oldest first)
+        const dateAscA = new Date(a.createdAt || 0).getTime();
+        const dateAscB = new Date(b.createdAt || 0).getTime();
+        return dateAscA - dateAscB;
+
       default:
         return 0;
     }

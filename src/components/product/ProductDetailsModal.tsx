@@ -59,6 +59,25 @@ export function ProductDetailsModal({
     };
   };
 
+  const getProductStatus = () => {
+    const isActive = product.status === "ACTIVE";
+
+    if (isActive) {
+      return {
+        text: "Active",
+        color: "text-green-600",
+        bgColor: "bg-green-100",
+        icon: "✅",
+      };
+    }
+    return {
+      text: "Inactive",
+      color: "text-red-600",
+      bgColor: "bg-red-100",
+      icon: "❌",
+    };
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
@@ -76,6 +95,7 @@ export function ProductDetailsModal({
   };
 
   const stockStatus = getStockStatus();
+  const productStatus = getProductStatus();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -154,11 +174,23 @@ export function ProductDetailsModal({
                   </div>
                 </div>
 
-                <div>
-                  <div className="text-sm text-gray-600 font-medium mb-1">
-                    Handle
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-600 font-medium mb-1">
+                      Handle
+                    </div>
+                    <div className="text-gray-900">{product.handle}</div>
                   </div>
-                  <div className="text-gray-900">{product.handle}</div>
+                  <div>
+                    <div className="text-sm text-gray-600 font-medium mb-1">
+                      Status
+                    </div>
+                    <div
+                      className={`text-lg font-semibold ${productStatus.color}`}
+                    >
+                      {productStatus.icon} {productStatus.text}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
