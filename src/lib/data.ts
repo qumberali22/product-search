@@ -9,44 +9,47 @@ export function parseCSVData(csvContent: string): Product[] {
       return [];
     }
 
-    const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(lines[0]).map((header) =>
+      header.toLowerCase()
+    );
 
     const requiredColumns = [
       {
         key: "title",
-        names: ["TITLE", "NAME", "PRODUCT NAME"],
+        names: ["title", "name", "product name"],
         required: true,
       },
       {
         key: "priceRange",
-        names: ["PRICE_RANGE", "PRICE", "PRICES"],
+        names: ["price_range", "price", "prices"],
         required: true,
       },
     ];
 
     const optionalColumns = [
-      { key: "id", names: ["ID", "PRODUCT_ID"], required: false },
-      { key: "handle", names: ["HANDLE", "SLUG"], required: false },
-      { key: "vendor", names: ["VENDOR", "BRAND"], required: false },
+      { key: "id", names: ["id", "product_id"], required: false },
+      { key: "handle", names: ["handle", "slug"], required: false },
+      { key: "vendor", names: ["vendor", "brand"], required: false },
       {
         key: "productType",
-        names: ["PRODUCT_TYPE", "TYPE", "CATEGORY"],
+        names: ["product_type", "type", "category"],
         required: false,
       },
       {
         key: "totalInventory",
-        names: ["TOTAL_INVENTORY", "INVENTORY", "STOCK"],
+        names: ["total_inventory", "inventory", "stock"],
         required: false,
       },
       {
         key: "hasOutOfStock",
-        names: ["HAS_OUT_OF_STOCK_VARIANTS", "OUT_OF_STOCK"],
+        names: ["has_out_of_stock_variants", "out_of_stock"],
         required: false,
       },
-      { key: "createdAt", names: ["CREATED_AT", "CREATED"], required: false },
-      { key: "updatedAt", names: ["UPDATED_AT", "UPDATED"], required: false },
-      { key: "tags", names: ["TAGS", "TAG"], required: false },
-      { key: "status", names: ["STATUS"], required: false },
+      { key: "createdAt", names: ["created_at", "created"], required: false },
+      { key: "updatedAt", names: ["updated_at", "updated"], required: false },
+      { key: "tags", names: ["tags", "tag"], required: false },
+      { key: "status", names: ["status"], required: false },
+      { key: "description", names: ["description", "desc"], required: false },
     ];
 
     const allColumns = [...requiredColumns, ...optionalColumns];
@@ -62,9 +65,11 @@ export function parseCSVData(csvContent: string): Product[] {
       toast.error(`Missing required columns: ${missingNames}`);
       return [];
     }
+
     const columnIndices = Object.fromEntries(
       allColumns.map((col) => [col.key, findColumnIndex(headers, col.names)])
     ) as Record<string, number>;
+
     if (columnIndices.id === -1) {
       toast.warning("ID column not found - temporary IDs will be generated");
     }
@@ -96,25 +101,27 @@ export function parseCSVData(csvContent: string): Product[] {
             ? values[columnIndices.id].trim()
             : `temp-${i}-${Date.now()}`;
 
-        const title = getValue("title", ["TITLE"]);
+        const title = getValue("title", ["title"]);
         if (!title) {
           toast.error(`Row ${i}: Missing required title, skipping`);
           errorCount++;
           continue;
         }
 
-        const priceRangeStr = getValue("priceRange", ["PRICE_RANGE"]);
+        const priceRangeStr = getValue("priceRange", ["price_range"]);
         if (!priceRangeStr) {
           toast.error(`Row ${i}: Missing required price range, skipping`);
           errorCount++;
           continue;
         }
+
         const handle =
-          getValue("handle", ["HANDLE"]) ||
+          getValue("handle", ["handle"]) ||
           title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/^-|-$/g, "");
+
         let priceRange;
         try {
           const priceData = priceRangeStr ? JSON.parse(priceRangeStr) : {};
@@ -142,7 +149,7 @@ export function parseCSVData(csvContent: string): Product[] {
           };
         }
 
-        const tagsStr = getValue("tags", ["TAGS"]);
+        const tagsStr = getValue("tags", ["tags"]);
         const seoTags = tagsStr
           ? tagsStr
               .split(/[,|]/)
@@ -162,13 +169,14 @@ export function parseCSVData(csvContent: string): Product[] {
           id,
           title: title.trim(),
           handle,
-          vendor: getValue("vendor", ["VENDOR"]) || "Unknown",
+          description: getValue("description", ["description"]) || "",
+          vendor: getValue("vendor", ["vendor"]) || "Unknown",
           productType:
-            getValue("productType", ["PRODUCT_TYPE"]) || "Uncategorized",
-          status: ["ACTIVE", "ARCHIVED", "DRAFT"].includes(
-            getValue("status", ["STATUS"]).toUpperCase()
+            getValue("productType", ["product_type"]) || "Uncategorized",
+          status: ["active", "archived", "draft"].includes(
+            getValue("status", ["status"]).toLowerCase()
           )
-            ? (getValue("status", ["STATUS"]).toUpperCase() as
+            ? (getValue("status", ["status"]).toUpperCase() as
                 | "ACTIVE"
                 | "ARCHIVED"
                 | "DRAFT")
@@ -176,14 +184,15 @@ export function parseCSVData(csvContent: string): Product[] {
           featuredImage: "/placeholder.svg?height=400&width=400",
           priceRange,
           totalInventory:
-            parseInt(getValue("totalInventory", ["TOTAL_INVENTORY"])) || 0,
+            parseInt(getValue("totalInventory", ["total_inventory"])) || 0,
           hasOutOfStockVariants:
-            getValue("hasOutOfStock", ["HAS_OUT_OF_STOCK"]).toUpperCase() ===
-            "TRUE",
+            getValue("hasOutOfStock", [
+              "has_out_of_stock_variants",
+            ]).toLowerCase() === "true",
           createdAt:
-            getValue("createdAt", ["CREATED_AT"]) || new Date().toISOString(),
+            getValue("createdAt", ["created_at"]) || new Date().toISOString(),
           updatedAt:
-            getValue("updatedAt", ["UPDATED_AT"]) || new Date().toISOString(),
+            getValue("updatedAt", ["updated_at"]) || new Date().toISOString(),
           seoTags,
         };
 
@@ -198,6 +207,7 @@ export function parseCSVData(csvContent: string): Product[] {
         errorCount++;
       }
     }
+
     let summaryMessage = `Processed ${
       lines.length - 1
     } rows: ${successCount} successful`;
@@ -264,16 +274,15 @@ function parseCSVLine(line: string): string[] {
 }
 
 function findColumnIndex(headers: string[], possibleNames: string[]): number {
-  const headerSet = new Set(headers.map((h) => h.toUpperCase().trim()));
-  console.log(headerSet);
   for (const name of possibleNames) {
     const index = headers.findIndex(
-      (h) => h.toUpperCase().trim() === name.toUpperCase().trim()
+      (h) => h.toLowerCase() === name.toLowerCase()
     );
     if (index >= 0) return index;
   }
   return -1;
 }
+
 export async function loadProducts(): Promise<Product[]> {
   return [];
 }
