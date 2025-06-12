@@ -156,9 +156,10 @@ export default function HomePage() {
   };
 
   const downloadSampleCSV = () => {
-    const sampleCSV = `ID,TITLE,HANDLE,VENDOR,PRODUCT_TYPE,PRICE_RANGE_V2,TOTAL_INVENTORY,HAS_OUT_OF_STOCK_VARIANTS,CREATED_AT,UPDATED_AT,TAGS,STATUS
-8121622593775,Sample Product,sample-product,Thorne,Stress Tablets,"{""min_variant_price"":{""amount"":18.55,""currency_code"":""GBP""},""max_variant_price"":{""amount"":18.55,""currency_code"":""GBP""}}",10,FALSE,2023-09-25 15:52:45.000 Z,2025-03-21 13:10:43.000 Z,"sample,product,tags",ACTIVE
-8121622626543,Another Sample Product,another-sample-product,Nordic Naturals,Vitamins & Supplements,"{""min_variant_price"":{""amount"":25.99,""currency_code"":""USD""},""max_variant_price"":{""amount"":25.99,""currency_code"":""USD""}}",25,FALSE,2023-10-15 10:30:22.000 Z,2025-03-21 13:10:43.000 Z,"vitamins,health,supplements",ACTIVE`;
+    const sampleCSV = `ID,TITLE,STATUS,IMAGE,VENDOR,PRODUCT_TYPE,DESCRIPTION,PRICE_RANGE,TOTAL_INVENTORY,HAS_OUT_OF_STOCK_VARIANTS,CREATED_AT,MODIFIED_AT,TAGS
+8121622593775,Sample Product,ACTIVE,https://example.com/image1.jpg,Thorne,Stress Tablets,"Helps with stress and anxiety","{'max_variant_price': 18.55, 'min_variant_price': 18.55}",10,FALSE,2023-09-25 15:52:45.000 Z,2025-03-21 13:10:43.000 Z,"sample,product,tags"
+8121622626543,Another Sample Product,ACTIVE,https://example.com/image2.jpg,Nordic Naturals,Vitamins & Supplements,"High-quality vitamins for daily nutrition","{'max_variant_price': 18.55, 'min_variant_price': 18.55}",25,FALSE,2023-10-15 10:30:22.000 Z,2025-03-21 13:10:43.000 Z,"vitamins,health,supplements"
+8121622659311,Out of Stock Product,ARCHIVED,https://example.com/image3.jpg,Thorne,Minerals,"Essential minerals for body function","{'max_variant_price': 18.55, 'min_variant_price': 18.55}",0,TRUE,2023-11-05 08:15:33.000 Z,2025-03-21 13:10:43.000 Z,"minerals,health"`;
 
     const blob = new Blob([sampleCSV], { type: "text/csv" });
     const url = window.URL.createObjectURL(blob);
@@ -278,20 +279,6 @@ export default function HomePage() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={handleRefreshData}
-                className="bg-gray-100 text-gray-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-2"
-                title="Refresh data"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
-              <button
-                onClick={handleClearData}
-                className="bg-red-100 text-red-700 px-3 py-2 rounded-md text-sm font-medium hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 flex items-center gap-2"
-                title="Clear all data"
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
-              <button
                 onClick={() => setShowUpload(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-2"
               >
@@ -326,7 +313,7 @@ export default function HomePage() {
                 onChange={setSearchQuery}
                 onSortChange={setSortBy}
                 sortBy={sortBy}
-                placeholder="Search by product name, vendor, or description..."
+                placeholder="Search by product name, vendor...."
               />
             </div>
             <ViewToggle view={view} onViewChange={setView} />

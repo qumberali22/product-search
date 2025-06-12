@@ -103,17 +103,11 @@ export function parseCSVData(csvContent: string): Product[] {
 
         const title = getValue("title", ["title"]);
         if (!title) {
-          toast.error(`Row ${i}: Missing required title, skipping`);
           errorCount++;
           continue;
         }
 
         const priceRangeStr = getValue("priceRange", ["price_range"]);
-        if (!priceRangeStr) {
-          toast.error(`Row ${i}: Missing required price range, skipping`);
-          errorCount++;
-          continue;
-        }
 
         const handle =
           getValue("handle", ["handle"]) ||

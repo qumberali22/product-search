@@ -261,14 +261,6 @@ export function CsvUpload({ onDataLoaded, onClose }: CsvUploadProps) {
               </div>
             </div>
           </div>
-
-          <button
-            onClick={downloadSampleCSV}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
-          >
-            <Download className="h-3 w-3" />
-            Download Sample CSV Template
-          </button>
         </div>
       </div>
     </div>
