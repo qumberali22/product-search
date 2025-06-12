@@ -13,12 +13,12 @@ export async function GET(request: NextRequest) {
     const minPrice = Number.parseInt(searchParams.get("minPrice") || "0");
     const maxPrice = Number.parseInt(searchParams.get("maxPrice") || "1000");
     const inStock = searchParams.get("inStock") === "true";
-    const sortBy = (searchParams.get("sortBy") || "relevance") as
-      | "relevance"
+    const sortBy = (searchParams.get("sortBy") || "name") as
       | "price-asc"
       | "price-desc"
       | "name"
-      | "date";
+      | "date"
+      | "date-asc";
 
     const filters: SearchFilters = {
       vendor,
