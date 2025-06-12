@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Upload, AlertCircle, Database, Trash2, RefreshCw } from "lucide-react";
+import { Upload, Database, Trash2, RefreshCw } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Filters } from "@/components/search/Filters";
 import { ResultsGrid } from "@/components/search/ResultsGrid";
@@ -26,10 +26,11 @@ export default function HomePage() {
   const [hasData, setHasData] = useState(false);
   const [view, setView] = useState<"grid" | "table">("table");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(24);
+  const [itemsPerPage, setItemsPerPage] = useState(24); // Default for grid view
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
   const [storedFilename, setStoredFilename] = useState<string>("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     vendor: "",
     productType: "",
@@ -39,6 +40,25 @@ export default function HomePage() {
   const [sortBy, setSortBy] = useState<
     "relevance" | "price-asc" | "price-desc" | "name" | "date"
   >("relevance");
+
+  // Adjust items per page based on view
+  useEffect(() => {
+    if (view === "grid") {
+      setItemsPerPage(24); // Good for grid layout
+    } else {
+      setItemsPerPage(25); // Good for table layout
+    }
+    setCurrentPage(1); // Reset to first page when changing view
+  }, [view]);
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
   useEffect(() => {
     const loadStoredData = () => {
@@ -50,6 +70,7 @@ export default function HomePage() {
           setProducts(storedData.products);
           setStoredFilename(storedData.filename || "");
           setHasData(true);
+          setShowSuccessMessage(true);
 
           const prices = storedData.products
             .map((p) => p.priceRange?.minVariantPrice.amount || 0)
@@ -85,6 +106,7 @@ export default function HomePage() {
     setProducts(csvProducts);
     setStoredFilename(filename || "");
     setHasData(true);
+    setShowSuccessMessage(true);
     setLoading(false);
     setCurrentPage(1);
 
@@ -127,7 +149,6 @@ export default function HomePage() {
 
   const handleRefreshData = () => {
     setLoading(true);
-    // Re-save current data to refresh timestamp
     if (products.length > 0) {
       saveProductsToStorage(products, storedFilename);
     }
@@ -150,10 +171,14 @@ export default function HomePage() {
     ].sort() as string[];
   }, [products]);
 
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   const storageInfo = getStorageInfo();
@@ -180,24 +205,6 @@ export default function HomePage() {
                 <Upload className="h-5 w-5" />
                 Upload CSV File
               </button>
-
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg text-left">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium mb-2">CSV Requirements:</p>
-                    <ul className="space-y-1 text-xs">
-                      <li>• Must include ID and TITLE columns</li>
-                      <li>• Supports VENDOR, PRODUCT_TYPE, PRICE_RANGE_V2</li>
-                      <li>
-                        • Handles JSON fields like price ranges and SEO data
-                      </li>
-                      <li>• Compatible with Shopify export format</li>
-                      <li>• Data will be saved in browser storage</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
 
               {storageInfo.hasData && (
                 <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-left">
@@ -267,19 +274,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-green-700 font-medium">
-                CSV data loaded successfully ({products.length} products)
-              </span>
-              <span className="text-xs text-green-600 ml-auto flex items-center gap-1">
-                <Database className="h-3 w-3" />
-                {vendors.length} vendors • {productTypes.length} product types •
-                Stored in browser
-              </span>
+          {showSuccessMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full" />
+                <span className="text-sm text-green-700 font-medium">
+                  CSV data loaded successfully ({products.length} products)
+                </span>
+                <span className="text-xs text-green-600 ml-auto flex items-center gap-1">
+                  <Database className="h-3 w-3" />
+                  {vendors.length} vendors • {productTypes.length} product types
+                  • Stored in browser
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mb-6">
@@ -320,12 +329,13 @@ export default function HomePage() {
               />
             ) : (
               <ResultsGrid
-                products={filteredProducts.slice(
-                  (currentPage - 1) * itemsPerPage,
-                  currentPage * itemsPerPage
-                )}
+                products={filteredProducts}
                 loading={false}
                 searchQuery={searchQuery}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
                 onProductClick={handleProductClick}
               />
             )}

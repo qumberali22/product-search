@@ -18,6 +18,7 @@ interface ProductTableProps {
 
 const COLUMNS = [
   { key: "product", label: "Product", width: "320px" },
+  { key: "title", label: "Title", width: "200px" }, // New column added here
   { key: "vendor", label: "Vendor", width: "120px" },
   { key: "type", label: "Type", width: "160px" },
   { key: "minPrice", label: "Min Price", width: "100px" },
@@ -67,7 +68,7 @@ export function ProductTable({
 }: ProductTableProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isDataReady, setIsDataReady] = useState(false);
-  console.log(isInitialLoad)
+
   // Handle initial load and data readiness
   useEffect(() => {
     if (products.length > 0 && !loading) {
@@ -185,39 +186,43 @@ export function ProductTable({
           </div>
         </div>
       </td>
-      {COLUMNS.slice(1, -4).map(({ key, width }) => (
+      {/* New Title column skeleton */}
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[1].width }}>
+        {createSkeleton("h-4", "w-32")}
+      </td>
+      {COLUMNS.slice(2, -4).map(({ key, width }) => (
         <td key={key} className={STYLES.tableCell} style={{ width }}>
           {createSkeleton("h-4", "w-16")}
         </td>
       ))}
       {/* Min Price skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
-        {createSkeleton("h-4", "w-16")}
-      </td>
-      {/* Max Price skeleton */}
       <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
         {createSkeleton("h-4", "w-16")}
       </td>
-      {/* Stock skeleton */}
+      {/* Max Price skeleton */}
       <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
+        {createSkeleton("h-4", "w-16")}
+      </td>
+      {/* Stock skeleton */}
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
         <div className="space-y-2">
           {createSkeleton("h-6 rounded-full", "w-20")}
           {createSkeleton("h-3", "w-12")}
         </div>
       </td>
       {/* Tags skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
         <div className="flex gap-1">
           {createSkeleton("h-6 rounded-full", "w-16")}
           {createSkeleton("h-6 rounded-full", "w-16")}
         </div>
       </td>
       {/* Created skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
         {createSkeleton("h-4", "w-16")}
       </td>
       {/* Actions skeleton */}
-      <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
+      <td className={STYLES.tableCell} style={{ width: COLUMNS[9].width }}>
         <div className="flex justify-center">
           {createSkeleton("h-8 w-8 rounded-full")}
         </div>
@@ -255,7 +260,6 @@ export function ProductTable({
                 height={48}
                 className="h-12 w-12 rounded-lg object-cover border border-gray-200"
                 onError={(e) => {
-                  // Fallback to default image if there's an error
                   const target = e.target as HTMLImageElement;
                   target.src = "/images/default-product.png";
                 }}
@@ -277,27 +281,33 @@ export function ProductTable({
             </div>
           </div>
         </td>
+        {/* New Title column */}
         <td className={STYLES.tableCell} style={{ width: COLUMNS[1].width }}>
+          <div className="text-sm font-medium text-gray-900">
+            {truncateText(product.title || "N/A", 25)}
+          </div>
+        </td>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[2].width }}>
           <div className="text-sm font-medium text-gray-900">
             {truncateText(product.vendor || "Unknown", 15)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[2].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
           <div className="text-sm text-gray-900">
             {truncateText(product.productType || "Uncategorized", 20)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[3].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
           <div className="text-sm font-medium text-gray-900">
             {formatMinPrice(product)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[4].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
           <div className="text-sm font-medium text-gray-900">
             {formatMaxPrice(product)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[5].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
           <div className="flex flex-col space-y-1">
             <span
               className={`${STYLES.tagBase} font-medium w-fit ${stockStatus.bgColor} ${stockStatus.color}`}
@@ -309,7 +319,7 @@ export function ProductTable({
             </span>
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[6].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
           <div className="flex flex-wrap gap-1">
             {product.seoTags?.slice(0, 2).map((tag, tagIndex) => (
               <span
@@ -330,12 +340,12 @@ export function ProductTable({
             )}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[7].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
           <div className="text-sm text-gray-500">
             {formatDate(product.createdAt)}
           </div>
         </td>
-        <td className={STYLES.tableCell} style={{ width: COLUMNS[8].width }}>
+        <td className={STYLES.tableCell} style={{ width: COLUMNS[9].width }}>
           <div className="flex justify-center">
             <button
               onClick={(e) => {
