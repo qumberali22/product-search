@@ -31,40 +31,33 @@ A modern, responsive product search application built with Next.js 15, featuring
 
 #### Option 1: Docker Setup (Recommended)
 
-\`\`\`bash
 git clone git@github.com:qumberali22/product-search.git
 cd product-search
 docker compose up --build
-\`\`\`
 
 #### Option 2: Local Development
 
 Clone the repository:
 
-\`\`\`bash
 git clone <repository-url>
 cd product-search-app
-\`\`\`
 
 Install dependencies:
 
-\`\`\`bash
 npm install
 
 # or
 
 yarn install
-\`\`\`
 
 Run the development server:
 
-\`\`\`bash
 npm run dev
 
 # or
 
 yarn dev
-\`\`\`
+
 
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
@@ -150,29 +143,6 @@ The application expects CSV data with the following columns:
 ## Screenshots / Demo
 
 Watch the demo video
-
-## Customization
-
-### Adding New Product Fields
-
-1. Update the `Product` interface in `src/types/product.d.ts`
-2. Modify the CSV parsing logic in `src/lib/data.ts`
-3. Update the product card component to display new fields
-
-### Modifying Search Logic
-
-The search logic is contained in `src/lib/search.ts`. You can:
-
-- Adjust search scoring algorithms
-- Add new filter types
-- Implement fuzzy search improvements
-
-### Styling Customization
-
-- Global styles: `src/app/globals.css`
-- Component styles: Individual component files using Tailwind classes
-- Theme customization: `tailwind.config.ts`
-
 
 ## Deployment
 
