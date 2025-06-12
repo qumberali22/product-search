@@ -1,157 +1,244 @@
 import type { Product } from "@/types/product";
+import { toast } from "sonner";
 
 export function parseCSVData(csvContent: string): Product[] {
-  const lines = csvContent.split("\n").filter((line) => line.trim());
-  if (lines.length < 2) return [];
+  try {
+    const lines = csvContent.split("\n").filter((line) => line.trim());
+    if (lines.length < 2) {
+      toast.error("CSV file is empty or has no data rows");
+      return [];
+    }
 
-  const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(lines[0]).map((header) =>
+      header.toLowerCase()
+    );
 
-  const columnIndices = {
-    id: findColumnIndex(headers, ["ID"]),
-    title: findColumnIndex(headers, ["TITLE"]),
-    handle: findColumnIndex(headers, ["HANDLE"]),
-    vendor: findColumnIndex(headers, ["VENDOR"]),
-    productType: findColumnIndex(headers, ["PRODUCT_TYPE"]),
-    priceRange: findColumnIndex(headers, ["PRICE_RANGE"]),
-    totalInventory: findColumnIndex(headers, ["TOTAL_INVENTORY"]),
-    hasOutOfStock: findColumnIndex(headers, ["HAS_OUT_OF_STOCK_VARIANTS"]),
-    createdAt: findColumnIndex(headers, ["CREATED_AT"]),
-    updatedAt: findColumnIndex(headers, ["UPDATED_AT"]),
-    tags: findColumnIndex(headers, ["TAGS"]),
-    status: findColumnIndex(headers, ["STATUS"]),
-  };
+    const requiredColumns = [
+      {
+        key: "title",
+        names: ["title", "name", "product name"],
+        required: true,
+      },
+      {
+        key: "priceRange",
+        names: ["price_range", "price", "prices"],
+        required: true,
+      },
+    ];
 
-  const products: Product[] = [];
-  let successCount = 0;
-  let errorCount = 0;
+    const optionalColumns = [
+      { key: "id", names: ["id", "product_id"], required: false },
+      { key: "handle", names: ["handle", "slug"], required: false },
+      { key: "vendor", names: ["vendor", "brand"], required: false },
+      {
+        key: "productType",
+        names: ["product_type", "type", "category"],
+        required: false,
+      },
+      {
+        key: "totalInventory",
+        names: ["total_inventory", "inventory", "stock"],
+        required: false,
+      },
+      {
+        key: "hasOutOfStock",
+        names: ["has_out_of_stock_variants", "out_of_stock"],
+        required: false,
+      },
+      { key: "createdAt", names: ["created_at", "created"], required: false },
+      { key: "updatedAt", names: ["updated_at", "updated"], required: false },
+      { key: "tags", names: ["tags", "tag"], required: false },
+      { key: "status", names: ["status"], required: false },
+      { key: "description", names: ["description", "desc"], required: false },
+    ];
 
-  for (let i = 1; i < lines.length; i++) {
-    try {
-      const values = parseCSVLine(lines[i]);
+    const allColumns = [...requiredColumns, ...optionalColumns];
 
-      const getValue = (index: number, fieldName: string = ""): string => {
-        if (index < 0) {
-          return "";
+    const missingRequiredColumns = requiredColumns.filter(
+      (col) => findColumnIndex(headers, col.names) === -1
+    );
+
+    if (missingRequiredColumns.length > 0) {
+      const missingNames = missingRequiredColumns
+        .map((col) => col.names[0])
+        .join(", ");
+      toast.error(`Missing required columns: ${missingNames}`);
+      return [];
+    }
+
+    const columnIndices = Object.fromEntries(
+      allColumns.map((col) => [col.key, findColumnIndex(headers, col.names)])
+    ) as Record<string, number>;
+
+    if (columnIndices.id === -1) {
+      toast.warning("ID column not found - temporary IDs will be generated");
+    }
+
+    const products: Product[] = [];
+    let successCount = 0;
+    let errorCount = 0;
+    let emptyFieldCount = 0;
+    const emptyFieldsReport: Record<string, number> = {};
+
+    for (let i = 1; i < lines.length; i++) {
+      try {
+        const values = parseCSVLine(lines[i]);
+        const emptyFields: string[] = [];
+
+        const getValue = (key: string, possibleNames: string[]): string => {
+          const index = columnIndices[key];
+          if (index === -1 || index >= values.length) {
+            emptyFields.push(possibleNames[0]);
+            return "";
+          }
+          const value = values[index]?.trim();
+          if (!value) emptyFields.push(possibleNames[0]);
+          return value || "";
+        };
+
+        const id =
+          columnIndices.id >= 0 && values[columnIndices.id]?.trim()
+            ? values[columnIndices.id].trim()
+            : `temp-${i}-${Date.now()}`;
+
+        const title = getValue("title", ["title"]);
+        if (!title) {
+          toast.error(`Row ${i}: Missing required title, skipping`);
+          errorCount++;
+          continue;
         }
 
-        const value = values[index]?.trim() || "";
-        if (i === 1 && fieldName) {
+        const priceRangeStr = getValue("priceRange", ["price_range"]);
+        if (!priceRangeStr) {
+          toast.error(`Row ${i}: Missing required price range, skipping`);
+          errorCount++;
+          continue;
         }
-        return value;
-      };
-      const id = getValue(columnIndices.id, "ID");
-      const title = getValue(columnIndices.title, "TITLE");
-      const handle = getValue(columnIndices.handle, "HANDLE");
-      const vendor = getValue(columnIndices.vendor, "VENDOR");
-      const productType = getValue(columnIndices.productType, "PRODUCT_TYPE");
-      const priceRangeStr = getValue(columnIndices.priceRange, "PRICE_RANGE");
-      const totalInventoryStr = getValue(
-        columnIndices.totalInventory,
-        "TOTAL_INVENTORY"
-      );
-      const hasOutOfStockStr = getValue(
-        columnIndices.hasOutOfStock,
-        "HAS_OUT_OF_STOCK"
-      );
-      const createdAt = getValue(columnIndices.createdAt, "CREATED_AT");
-      const updatedAt = getValue(columnIndices.updatedAt, "UPDATED_AT");
-      const tagsStr = getValue(columnIndices.tags, "TAGS");
-      const status = getValue(columnIndices.status, "STATUS");
 
-      if (!title) {
-        console.log(`❌ Row ${i}: No title found, skipping`);
-        errorCount++;
-        continue;
-      }
-
-      // Parse price range
-      let priceRange;
-      if (priceRangeStr) {
-        try {
-          const priceData = JSON.parse(priceRangeStr);
-          console.log("The price data parse: ", priceData);
-          priceRange = {
-            minVariantPrice: {
-              amount: Number.parseFloat(
-                priceData.min_variant_price?.amount || "24.00"
-              ),
-              currencyCode: priceData.min_variant_price?.currency_code || "USD",
-            },
-            maxVariantPrice: {
-              amount: Number.parseFloat(
-                priceData.max_variant_price?.amount || "28.00"
-              ),
-              currencyCode: priceData.max_variant_price?.currency_code || "USD",
-            },
-          };
-        } catch (e) {
-          console.log(`⚠️  Failed to parse price range JSON: ${e}`);
-          const min_price =
-            Number.parseFloat(priceRangeStr.replace(/[^0-9.]/g, "")) || 24.0;
-          const max_price =
-            Number.parseFloat(priceRangeStr.replace(/[^0-9.]/g, "")) || 28.0;
-          priceRange = {
-            minVariantPrice: { amount: min_price, currencyCode: "USD" },
-            maxVariantPrice: { amount: max_price, currencyCode: "USD" },
-          };
-        }
-      }
-
-      const seoTags = tagsStr
-        ? tagsStr
-            .split(/[,|]/)
-            .map((tag) => tag.trim())
-            .filter(Boolean)
-            .filter((tag) => tag.length > 0 && tag.length < 50)
-            .slice(0, 10)
-        : [];
-
-      const totalInventory = totalInventoryStr
-        ? Number.parseInt(totalInventoryStr) || 0
-        : 0;
-      const hasOutOfStockVariants = hasOutOfStockStr?.toUpperCase() === "TRUE";
-
-      const productStatus = ["ACTIVE", "ARCHIVED", "DRAFT"].includes(
-        status?.toUpperCase()
-      )
-        ? (status.toUpperCase() as "ACTIVE" | "ARCHIVED" | "DRAFT")
-        : "ACTIVE";
-
-      const product: Product = {
-        id: id || String(i),
-        title: title.trim(),
-        handle:
-          handle ||
+        const handle =
+          getValue("handle", ["handle"]) ||
           title
             .toLowerCase()
             .replace(/[^a-z0-9]+/g, "-")
-            .replace(/^-|-$/g, ""),
-        vendor: vendor || "Unknown",
-        productType: productType || "Uncategorized",
-        status: productStatus,
-        featuredImage: "/placeholder.svg?height=400&width=400",
-        priceRange,
-        totalInventory,
-        hasOutOfStockVariants,
-        createdAt,
-        updatedAt,
-        seoTags,
-      };
+            .replace(/^-|-$/g, "");
 
-      products.push(product);
-      successCount++;
-      console.log(successCount);
-    } catch (error) {
-      console.error(`❌ Error parsing row ${i}:`, error);
-      errorCount++;
-      console.log(errorCount);
-      continue;
+        let priceRange;
+        try {
+          const priceData = priceRangeStr ? JSON.parse(priceRangeStr) : {};
+          priceRange = {
+            minVariantPrice: {
+              amount: parseFloat(priceData.min_variant_price?.amount || "0"),
+              currencyCode: priceData.min_variant_price?.currency_code || "USD",
+            },
+            maxVariantPrice: {
+              amount: parseFloat(priceData.max_variant_price?.amount || "0"),
+              currencyCode: priceData.max_variant_price?.currency_code || "USD",
+            },
+          };
+        } catch {
+          const prices = priceRangeStr.match(/\d+\.?\d*/g) || ["0", "0"];
+          priceRange = {
+            minVariantPrice: {
+              amount: parseFloat(prices[0]),
+              currencyCode: "USD",
+            },
+            maxVariantPrice: {
+              amount: parseFloat(prices[1]),
+              currencyCode: "USD",
+            },
+          };
+        }
+
+        const tagsStr = getValue("tags", ["tags"]);
+        const seoTags = tagsStr
+          ? tagsStr
+              .split(/[,|]/)
+              .map((tag) => tag.trim())
+              .filter((tag) => tag.length > 0 && tag.length < 50)
+              .slice(0, 10)
+          : [];
+
+        if (emptyFields.length > 0) {
+          emptyFields.forEach((field) => {
+            emptyFieldsReport[field] = (emptyFieldsReport[field] || 0) + 1;
+          });
+          emptyFieldCount++;
+        }
+
+        const product: Product = {
+          id,
+          title: title.trim(),
+          handle,
+          description: getValue("description", ["description"]) || "",
+          vendor: getValue("vendor", ["vendor"]) || "Unknown",
+          productType:
+            getValue("productType", ["product_type"]) || "Uncategorized",
+          status: ["active", "archived", "draft"].includes(
+            getValue("status", ["status"]).toLowerCase()
+          )
+            ? (getValue("status", ["status"]).toUpperCase() as
+                | "ACTIVE"
+                | "ARCHIVED"
+                | "DRAFT")
+            : "ACTIVE",
+          featuredImage: "/placeholder.svg?height=400&width=400",
+          priceRange,
+          totalInventory:
+            parseInt(getValue("totalInventory", ["total_inventory"])) || 0,
+          hasOutOfStockVariants:
+            getValue("hasOutOfStock", [
+              "has_out_of_stock_variants",
+            ]).toLowerCase() === "true",
+          createdAt:
+            getValue("createdAt", ["created_at"]) || new Date().toISOString(),
+          updatedAt:
+            getValue("updatedAt", ["updated_at"]) || new Date().toISOString(),
+          seoTags,
+        };
+
+        products.push(product);
+        successCount++;
+      } catch (error) {
+        toast.error(
+          `Error parsing row ${i}: ${
+            error instanceof Error ? error.message : "Unknown error"
+          }`
+        );
+        errorCount++;
+      }
     }
+
+    let summaryMessage = `Processed ${
+      lines.length - 1
+    } rows: ${successCount} successful`;
+    if (errorCount > 0) summaryMessage += `, ${errorCount} failed`;
+    if (emptyFieldCount > 0)
+      summaryMessage += `, ${emptyFieldCount} with empty fields`;
+
+    if (Object.keys(emptyFieldsReport).length > 0) {
+      const emptyDetails = Object.entries(emptyFieldsReport)
+        .map(([field, count]) => `${field} (${count})`)
+        .join(", ");
+      toast.warning(`Empty fields detected: ${emptyDetails}`);
+    }
+
+    if (errorCount > 0) {
+      toast.error(summaryMessage);
+    } else if (emptyFieldCount > 0) {
+      toast.warning(summaryMessage);
+    } else {
+      toast.success(summaryMessage);
+    }
+
+    return products;
+  } catch (error) {
+    toast.error(
+      `Failed to parse CSV: ${
+        error instanceof Error ? error.message : "Unknown error"
+      }`
+    );
+    return [];
   }
-
-  console.log("The product data: ", products);
-
-  return products;
 }
 
 function parseCSVLine(line: string): string[] {
@@ -183,18 +270,15 @@ function parseCSVLine(line: string): string[] {
   }
 
   values.push(currentValue);
-
-  return values;
+  return values.map((v) => v.trim());
 }
 
 function findColumnIndex(headers: string[], possibleNames: string[]): number {
   for (const name of possibleNames) {
     const index = headers.findIndex(
-      (h) => h.toUpperCase().trim() === name.toUpperCase().trim()
+      (h) => h.toLowerCase() === name.toLowerCase()
     );
-    if (index >= 0) {
-      return index;
-    }
+    if (index >= 0) return index;
   }
   return -1;
 }

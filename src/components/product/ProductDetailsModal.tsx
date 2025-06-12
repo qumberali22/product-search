@@ -59,6 +59,25 @@ export function ProductDetailsModal({
     };
   };
 
+  const getProductStatus = () => {
+    const isActive = product.status === "ACTIVE";
+
+    if (isActive) {
+      return {
+        text: "Active",
+        color: "text-green-600",
+        bgColor: "bg-green-100",
+        icon: "✅",
+      };
+    }
+    return {
+      text: "Inactive",
+      color: "text-red-600",
+      bgColor: "bg-red-100",
+      icon: "❌",
+    };
+  };
+
   const formatDate = (dateString?: string) => {
     if (!dateString) return "N/A";
     try {
@@ -76,6 +95,7 @@ export function ProductDetailsModal({
   };
 
   const stockStatus = getStockStatus();
+  const productStatus = getProductStatus();
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -109,7 +129,6 @@ export function ProductDetailsModal({
                     fill
                     className="object-cover"
                     onError={(e) => {
-                      // Fallback to default image if there's an error
                       const target = e.target as HTMLImageElement;
                       target.src = "/images/default-product.png";
                     }}
@@ -118,12 +137,12 @@ export function ProductDetailsModal({
               </div>
 
               <div className="space-y-6">
-                <div>
-                  <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <div className="text-sm text-gray-600 font-medium mb-1">
+                    Product Title
+                  </div>
+                  <div className="text-xl font-bold text-gray-900">
                     {product.title}
-                  </h1>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>Handle: {product.handle}</span>
                   </div>
                 </div>
 
@@ -151,6 +170,25 @@ export function ProductDetailsModal({
                     </div>
                     <div className="text-lg font-semibold text-gray-900">
                       {product.productType || "Uncategorized"}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <div className="text-sm text-gray-600 font-medium mb-1">
+                      Handle
+                    </div>
+                    <div className="text-gray-900">{product.handle}</div>
+                  </div>
+                  <div>
+                    <div className="text-sm text-gray-600 font-medium mb-1">
+                      Status
+                    </div>
+                    <div
+                      className={`text-lg font-semibold ${productStatus.color}`}
+                    >
+                      {productStatus.icon} {productStatus.text}
                     </div>
                   </div>
                 </div>
@@ -241,7 +279,7 @@ export function ProductDetailsModal({
                   </div>
                   <div>
                     <div className="text-sm text-gray-600 font-medium mb-1">
-                      Updated At
+                      Modified At
                     </div>
                     <div className="text-gray-900">
                       {formatDate(product.updatedAt)}

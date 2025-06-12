@@ -21,29 +21,13 @@ export function PaginationControls({
 }: PaginationControlsProps) {
   const startIndex = (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+  console.log(onItemsPerPageChange);
 
   return (
     <div className="flex items-center justify-between bg-white px-6 py-3 border-t border-gray-200">
       <div className="flex items-center gap-4">
         <div className="text-sm text-gray-700">
           Showing {startIndex}-{endIndex} of {totalItems} results
-        </div>
-        <div className="flex items-center gap-2">
-          <label htmlFor="itemsPerPage" className="text-sm text-gray-700">
-            Show:
-          </label>
-          <select
-            id="itemsPerPage"
-            value={itemsPerPage}
-            onChange={(e) => onItemsPerPageChange(Number(e.target.value))}
-            className="border border-gray-300 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value={10}>10</option>
-            <option value={25}>25</option>
-            <option value={50}>50</option>
-            <option value={100}>100</option>
-          </select>
-          <span className="text-sm text-gray-700">per page</span>
         </div>
       </div>
 

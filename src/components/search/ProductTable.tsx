@@ -17,9 +17,9 @@ interface ProductTableProps {
 }
 
 const COLUMNS = [
-  { key: "product", label: "Product", width: "320px" },
+  { key: "product", label: "Title", width: "320px" }, // Changed from "Product" to "Title"
   { key: "vendor", label: "Vendor", width: "120px" },
-  { key: "type", label: "Type", width: "160px" },
+  { key: "type", label: "Product Type", width: "160px" }, // Changed from "Type" to "Product Type"
   { key: "minPrice", label: "Min Price", width: "100px" },
   { key: "maxPrice", label: "Max Price", width: "100px" },
   { key: "stock", label: "Stock", width: "140px" },
@@ -67,7 +67,7 @@ export function ProductTable({
 }: ProductTableProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isDataReady, setIsDataReady] = useState(false);
-  console.log(isInitialLoad)
+
   // Handle initial load and data readiness
   useEffect(() => {
     if (products.length > 0 && !loading) {
@@ -255,7 +255,6 @@ export function ProductTable({
                 height={48}
                 className="h-12 w-12 rounded-lg object-cover border border-gray-200"
                 onError={(e) => {
-                  // Fallback to default image if there's an error
                   const target = e.target as HTMLImageElement;
                   target.src = "/images/default-product.png";
                 }}
@@ -417,7 +416,7 @@ export function ProductTable({
       <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-semibold text-gray-900">
-            Products ({products.length.toLocaleString()} total)
+            Total Products ({products.length.toLocaleString()} total)
           </h3>
           <div className="text-sm text-gray-500">
             Showing {startIndex + 1}-{Math.min(endIndex, products.length)} of{" "}

@@ -7,7 +7,7 @@ interface SearchBarProps {
   value: string;
   onChange: (value: string) => void;
   onSortChange: (
-    sort: "relevance" | "price-asc" | "price-desc" | "name" | "date"
+    sort: "price-asc" | "price-desc" | "name" | "date" | "date-asc"
   ) => void;
   sortBy: string;
   placeholder?: string;
@@ -23,14 +23,15 @@ export function SearchBar({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const sortOptions = [
-    { value: "relevance", label: "Relevance" },
-    { value: "name", label: "Name A-Z" },
+    { value: "name", label: "Title A-Z" },
     { value: "price-asc", label: "Price: Low to High" },
     { value: "price-desc", label: "Price: High to Low" },
     { value: "date", label: "Newest First" },
+    { value: "date-asc", label: "Oldest First" },
   ];
 
-  const currentSort = sortOptions.find((option) => option.value === sortBy);
+  const currentSort =
+    sortOptions.find((option) => option.value === sortBy) || sortOptions[0];
 
   return (
     <div className="flex flex-col sm:flex-row gap-4">
@@ -41,18 +42,16 @@ export function SearchBar({
           placeholder={placeholder}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full pl-10 h-12 px-3 py-2 text-black border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full pl-10 h-12 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 placeholder-gray-500"
         />
       </div>
 
       <div className="relative">
         <button
           onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-          className="h-12 px-4 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center gap-2"
+          className="h-12 px-4 border border-gray-300 rounded-md shadow-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 flex items-center gap-2 text-gray-900"
         >
-          <span className="text-sm text-black">
-            Sort by: {currentSort?.label}
-          </span>
+          <span className="text-sm">Sort by: {currentSort.label}</span>
           <ChevronDown className="h-4 w-4" />
         </button>
 
@@ -62,7 +61,7 @@ export function SearchBar({
               <button
                 key={option.value}
                 onClick={() => {
-                  onSortChange(option.value as "relevance" | "price-asc" | "price-desc" | "name" | "date");
+                  onSortChange(option.value as any);
                   setIsDropdownOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${

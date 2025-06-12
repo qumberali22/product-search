@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Upload, AlertCircle, Database, Trash2, RefreshCw } from "lucide-react";
+import { Upload, Database, Trash2, RefreshCw, Download } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Filters } from "@/components/search/Filters";
 import { ResultsGrid } from "@/components/search/ResultsGrid";
@@ -26,10 +26,11 @@ export default function HomePage() {
   const [hasData, setHasData] = useState(false);
   const [view, setView] = useState<"grid" | "table">("table");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(24);
+  const [itemsPerPage, setItemsPerPage] = useState(24);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showProductModal, setShowProductModal] = useState(false);
   const [storedFilename, setStoredFilename] = useState<string>("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({
     vendor: "",
     productType: "",
@@ -37,8 +38,27 @@ export default function HomePage() {
     inStock: false,
   });
   const [sortBy, setSortBy] = useState<
-    "relevance" | "price-asc" | "price-desc" | "name" | "date"
-  >("relevance");
+    "price-asc" | "price-desc" | "name" | "date" | "date-asc"
+  >("name");
+
+  // Adjust items per page based on view
+  useEffect(() => {
+    if (view === "grid") {
+      setItemsPerPage(24);
+    } else {
+      setItemsPerPage(25);
+    }
+    setCurrentPage(1);
+  }, [view]);
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => {
+        setShowSuccessMessage(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
   useEffect(() => {
     const loadStoredData = () => {
@@ -50,6 +70,7 @@ export default function HomePage() {
           setProducts(storedData.products);
           setStoredFilename(storedData.filename || "");
           setHasData(true);
+          setShowSuccessMessage(true);
 
           const prices = storedData.products
             .map((p) => p.priceRange?.minVariantPrice.amount || 0)
@@ -85,6 +106,7 @@ export default function HomePage() {
     setProducts(csvProducts);
     setStoredFilename(filename || "");
     setHasData(true);
+    setShowSuccessMessage(true);
     setLoading(false);
     setCurrentPage(1);
 
@@ -127,11 +149,26 @@ export default function HomePage() {
 
   const handleRefreshData = () => {
     setLoading(true);
-    // Re-save current data to refresh timestamp
     if (products.length > 0) {
       saveProductsToStorage(products, storedFilename);
     }
     setTimeout(() => setLoading(false), 500);
+  };
+
+  const downloadSampleCSV = () => {
+    const sampleCSV = `ID,TITLE,HANDLE,VENDOR,PRODUCT_TYPE,PRICE_RANGE_V2,TOTAL_INVENTORY,HAS_OUT_OF_STOCK_VARIANTS,CREATED_AT,UPDATED_AT,TAGS,STATUS
+8121622593775,Sample Product,sample-product,Thorne,Stress Tablets,"{""min_variant_price"":{""amount"":18.55,""currency_code"":""GBP""},""max_variant_price"":{""amount"":18.55,""currency_code"":""GBP""}}",10,FALSE,2023-09-25 15:52:45.000 Z,2025-03-21 13:10:43.000 Z,"sample,product,tags",ACTIVE
+8121622626543,Another Sample Product,another-sample-product,Nordic Naturals,Vitamins & Supplements,"{""min_variant_price"":{""amount"":25.99,""currency_code"":""USD""},""max_variant_price"":{""amount"":25.99,""currency_code"":""USD""}}",25,FALSE,2023-10-15 10:30:22.000 Z,2025-03-21 13:10:43.000 Z,"vitamins,health,supplements",ACTIVE`;
+
+    const blob = new Blob([sampleCSV], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "sample-products.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
   };
 
   const filteredProducts = useMemo(() => {
@@ -150,10 +187,14 @@ export default function HomePage() {
     ].sort() as string[];
   }, [products]);
 
-
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
   };
 
   const storageInfo = getStorageInfo();
@@ -161,9 +202,9 @@ export default function HomePage() {
   // Show welcome screen if no data is loaded
   if (!hasData && !loading) {
     return (
-      <div className="bg-gray-50 min-h-screen">
-        <div className="container mx-auto px-4 py-8">
-          <div className="text-center py-16">
+      <div className="bg-gray-50 min-h-screen flex flex-col">
+        <div className="container mx-auto px-4 py-8 flex-grow">
+          <div className="text-center py-8">
             <div className="max-w-md mx-auto">
               <Upload className="h-16 w-16 text-gray-400 mx-auto mb-6" />
               <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -173,34 +214,27 @@ export default function HomePage() {
                 Upload your CSV file to start searching and analyzing your
                 product data.
               </p>
-              <button
-                onClick={() => setShowUpload(true)}
-                className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-3 mx-auto"
-              >
-                <Upload className="h-5 w-5" />
-                Upload CSV File
-              </button>
 
-              <div className="mt-8 p-4 bg-blue-50 rounded-lg text-left">
-                <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="text-sm text-blue-800">
-                    <p className="font-medium mb-2">CSV Requirements:</p>
-                    <ul className="space-y-1 text-xs">
-                      <li>• Must include ID and TITLE columns</li>
-                      <li>• Supports VENDOR, PRODUCT_TYPE, PRICE_RANGE_V2</li>
-                      <li>
-                        • Handles JSON fields like price ranges and SEO data
-                      </li>
-                      <li>• Compatible with Shopify export format</li>
-                      <li>• Data will be saved in browser storage</li>
-                    </ul>
-                  </div>
-                </div>
+              <div className="space-y-4">
+                <button
+                  onClick={() => setShowUpload(true)}
+                  className="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 flex items-center gap-3 mx-auto"
+                >
+                  <Upload className="h-5 w-5" />
+                  Upload CSV File
+                </button>
+
+                <button
+                  onClick={downloadSampleCSV}
+                  className="border border-gray-300 text-gray-700 bg-white px-6 py-3 rounded-lg text-lg font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 flex items-center gap-3 mx-auto transition-colors"
+                >
+                  <Download className="h-5 w-5" />
+                  Download Sample CSV Template
+                </button>
               </div>
 
               {storageInfo.hasData && (
-                <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg text-left">
+                <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-left">
                   <div className="flex items-start gap-3">
                     <Database className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
                     <div className="text-sm text-amber-800">
@@ -267,19 +301,21 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
-            <div className="flex items-center gap-2">
-              <div className="h-2 w-2 bg-green-500 rounded-full" />
-              <span className="text-sm text-green-700 font-medium">
-                CSV data loaded successfully ({products.length} products)
-              </span>
-              <span className="text-xs text-green-600 ml-auto flex items-center gap-1">
-                <Database className="h-3 w-3" />
-                {vendors.length} vendors • {productTypes.length} product types •
-                Stored in browser
-              </span>
+          {showSuccessMessage && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-3 mb-4">
+              <div className="flex items-center gap-2">
+                <div className="h-2 w-2 bg-green-500 rounded-full" />
+                <span className="text-sm text-green-700 font-medium">
+                  CSV data loaded successfully ({products.length} products)
+                </span>
+                <span className="text-xs text-green-600 ml-auto flex items-center gap-1">
+                  <Database className="h-3 w-3" />
+                  {vendors.length} vendors • {productTypes.length} product types
+                  • Stored in browser
+                </span>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         <div className="mb-6">
@@ -320,12 +356,13 @@ export default function HomePage() {
               />
             ) : (
               <ResultsGrid
-                products={filteredProducts.slice(
-                  (currentPage - 1) * itemsPerPage,
-                  currentPage * itemsPerPage
-                )}
+                products={filteredProducts}
                 loading={false}
                 searchQuery={searchQuery}
+                currentPage={currentPage}
+                itemsPerPage={itemsPerPage}
+                onPageChange={handlePageChange}
+                onItemsPerPageChange={handleItemsPerPageChange}
                 onProductClick={handleProductClick}
               />
             )}
