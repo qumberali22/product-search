@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "sonner"; // or "react-hot-toast"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -38,6 +39,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </header>
 
         <main className="min-h-screen">{children}</main>
+
+        {/* Toast provider */}
+        <Toaster position="top-right" richColors expand={true} />
 
         <footer className="bg-gray-900 text-white">
           <div className="container mx-auto px-4 py-8">
