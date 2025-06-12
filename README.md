@@ -195,3 +195,9 @@ The application can be deployed to any platform that supports Next.js:
 
 This project is licensed under the MIT License.
 \`\`\`
+
+
+# clone the project
+# git@github.com:qumberali22/product-search.git
+# after cloning the project just go to the product-search directory and run this command
+# docker compose up --build

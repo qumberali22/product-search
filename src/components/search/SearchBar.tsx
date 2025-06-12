@@ -61,7 +61,7 @@ export function SearchBar({
               <button
                 key={option.value}
                 onClick={() => {
-                  onSortChange(option.value as any);
+                  onSortChange(option.value as "name" | "price-asc" | "price-desc" | "date" | "date-asc");
                   setIsDropdownOpen(false);
                 }}
                 className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-100 ${

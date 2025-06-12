@@ -67,7 +67,7 @@ export function ProductTable({
 }: ProductTableProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const [isDataReady, setIsDataReady] = useState(false);
-
+  console.log(isInitialLoad);
   // Handle initial load and data readiness
   useEffect(() => {
     if (products.length > 0 && !loading) {
