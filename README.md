@@ -42,6 +42,8 @@ Clone the repository:
 git clone <repository-url>
 cd product-search-app
 
+docker compose up --build
+
 Install dependencies:
 
 npm install
