@@ -282,7 +282,7 @@ export default function HomePage() {
                 onChange={setSearchQuery}
                 onSortChange={setSortBy}
                 sortBy={sortBy}
-                placeholder="Search by product name, vendor...."
+                placeholder="Search by product name, vendor, Product Type...."
               />
             </div>
             <ViewToggle view={view} onViewChange={setView} />
