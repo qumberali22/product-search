@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { Upload, Database, Trash2, RefreshCw, Download } from "lucide-react";
+import { Upload, Database, Download } from "lucide-react";
 import { SearchBar } from "@/components/search/SearchBar";
 import { Filters } from "@/components/search/Filters";
 import { ResultsGrid } from "@/components/search/ResultsGrid";
@@ -10,12 +10,7 @@ import { ViewToggle } from "@/components/search/ViewToggle";
 import { CsvUpload } from "@/components/upload/CsvUpload";
 import { ProductDetailsModal } from "@/components/product/ProductDetailsModal";
 import { searchProducts } from "@/lib/search";
-import {
-  loadProductsFromStorage,
-  clearProductsFromStorage,
-  getStorageInfo,
-  saveProductsToStorage,
-} from "@/lib/localStorage";
+import { loadProductsFromStorage, getStorageInfo } from "@/lib/localStorage";
 import type { Product, SearchFilters } from "@/types/product";
 
 export default function HomePage() {
@@ -37,6 +32,7 @@ export default function HomePage() {
     priceRange: { min: 0, max: 1000 },
     inStock: false,
   });
+  console.log(storedFilename);
   const [sortBy, setSortBy] = useState<
     "price-asc" | "price-desc" | "name" | "date" | "date-asc"
   >("name");
@@ -126,33 +122,6 @@ export default function HomePage() {
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);
     setShowProductModal(true);
-  };
-
-  const handleClearData = () => {
-    if (
-      confirm(
-        "Are you sure you want to clear all stored data? This action cannot be undone."
-      )
-    ) {
-      clearProductsFromStorage();
-      setProducts([]);
-      setHasData(false);
-      setStoredFilename("");
-      setFilters({
-        vendor: "",
-        productType: "",
-        priceRange: { min: 0, max: 1000 },
-        inStock: false,
-      });
-    }
-  };
-
-  const handleRefreshData = () => {
-    setLoading(true);
-    if (products.length > 0) {
-      saveProductsToStorage(products, storedFilename);
-    }
-    setTimeout(() => setLoading(false), 500);
   };
 
   const downloadSampleCSV = () => {

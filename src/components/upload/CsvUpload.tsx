@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { Upload, X, CheckCircle, Download, AlertTriangle } from "lucide-react";
+import { Upload, X, CheckCircle, AlertTriangle } from "lucide-react";
 import { useState, useRef } from "react";
 import type { Product } from "@/types/product";
 import { parseCSVData } from "@/lib/data";
@@ -117,21 +117,6 @@ export function CsvUpload({ onDataLoaded, onClose }: CsvUploadProps) {
     } finally {
       setIsProcessing(false);
     }
-  };
-
-  const downloadSampleCSV = () => {
-    const sampleCSV = `ID,TITLE,HANDLE,VENDOR,PRODUCT_TYPE,PRICE_RANGE_V2,TOTAL_INVENTORY,HAS_OUT_OF_STOCK_VARIANTS,CREATED_AT,UPDATED_AT,TAGS,STATUS
-8121622593775,Sample Product,sample-product,Thorne,Stress Tablets,"{""min_variant_price"":{""amount"":18.55,""currency_code"":""GBP""},""max_variant_price"":{""amount"":18.55,""currency_code"":""GBP""}}",10,FALSE,2023-09-25 15:52:45.000 Z,2025-03-21 13:10:43.000 Z,"sample,product,tags",ACTIVE`;
-
-    const blob = new Blob([sampleCSV], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "sample-products.csv";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
   };
 
   return (
