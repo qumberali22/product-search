@@ -14,7 +14,6 @@ export function searchProducts(
     filtered = filtered.filter((product) => {
       const searchableText = [
         product.title,
-        product.description,
         product.vendor,
         product.productType,
         ...(product.seoTags || []),
